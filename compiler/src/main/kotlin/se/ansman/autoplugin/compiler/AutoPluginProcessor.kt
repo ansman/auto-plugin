@@ -148,7 +148,7 @@ class AutoPluginProcessor : AbstractProcessor() {
             }
 
             try {
-                filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceFile)
+                filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceFile, implementationClass)
                     .openWriter()
                     .use { it.write("implementation-class=${implementationClass.getBinaryName()}") }
             } catch (e: IOException) {
