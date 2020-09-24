@@ -1,5 +1,11 @@
 AutoPlugin
 ===
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ansman/auto-plugin)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.ansman.autoplugin/api/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.ansman.autoplugin/api)
+![Bintray](https://img.shields.io/bintray/v/ansman/auto-plugin/api)
+![GitHub](https://img.shields.io/github/license/ansman/auto-plugin.svg?color=green&style=popout)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ansman/auto-plugin/Check)
+
 A configuration/metadata generator for Gradle Plugins.
 
 Gradle uses a special file inside the META-INF metadata to find declared plugins. Keeping these files up to date can be 
