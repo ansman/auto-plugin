@@ -8,7 +8,7 @@ AutoPlugin
 
 A configuration/metadata generator for Gradle Plugins.
 
-Gradle uses a special file inside the META-INF metadata to find declared plugins. Keeping these files up to date can be 
+Gradle uses a special file inside the META-INF metadata to find declared plugins. Keeping these files up to date can be
 tedious and error prone. AutoPlugin simplifies this by generating these files at compile time.
 
 Simply annotate your plugin with `@AutoPlugin` and provide the Plugin ID. AutoPlugin will do the rest.
@@ -50,10 +50,10 @@ Setup
 To get started you'll need to include the api as regular dependency and the compiler as an annotation processor:
 ```kotlin
 dependencies {
-  implementation("se.ansman.autoplugin:api:0.1.0")
-  kapt("se.ansman.autoplugin:compile:0.1.0")
+  implementation("se.ansman.autoplugin:api:0.1.1")
+  kapt("se.ansman.autoplugin:compile:0.1.1")
   // For non kotlin projects you'll use something like this
-  annotationsProcessor("se.ansman.autoplugin:compile:0.1.0")
+  annotationsProcessor("se.ansman.autoplugin:compile:0.1.1")
 }
 ```
 
