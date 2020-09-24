@@ -11,7 +11,7 @@ A configuration/metadata generator for Gradle Plugins.
 Gradle uses a special file inside the META-INF metadata to find declared plugins. Keeping these files up to date can be 
 tedious and error prone. AutoPlugin simplifies this by generating these files at compile time.
 
-Simply annotated your plugin with `@AutoPlugin` and provide the Plugin ID. AutoPlugin will do the rest.
+Simply annotate your plugin with `@AutoPlugin` and provide the Plugin ID. AutoPlugin will do the rest.
 
 Example
 ---
