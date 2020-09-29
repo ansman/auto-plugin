@@ -14,22 +14,19 @@
 package se.ansman.autoplugin.compiler
 
 import com.tschuchort.compiletesting.KotlinCompilation
+import com.tschuchort.compiletesting.kspSourcesDir
+import com.tschuchort.compiletesting.symbolProcessors
 import se.ansman.autoplugin.compiler.test.BaseAutoPluginProcessorTest
-import java.io.FileNotFoundException
 
-/** Tests the [AutoPluginProcessor]. */
-class AutoPluginProcessorTest : BaseAutoPluginProcessorTest() {
-
+/** Tests the [AutoPluginSymbolProcessorTest]. */
+class AutoPluginSymbolProcessorTest : BaseAutoPluginProcessorTest() {
     override fun KotlinCompilation.configure() {
-        annotationProcessors = listOf(AutoPluginProcessor())
+        symbolProcessors = listOf(AutoPluginSymbolProcessor())
     }
 
     override fun getResourceAsText(
         compilation: KotlinCompilation,
         result: KotlinCompilation.Result,
         name: String
-    ): String =
-        (result.classLoader.getResourceAsStream(name) ?: throw FileNotFoundException(name))
-            .reader()
-            .use { it.readText() }
+    ): String = compilation.kspSourcesDir.resolve("resource/$name").readText()
 }

@@ -1,11 +1,12 @@
 plugins {
-    library
+    `published-library`
     id("kotlin-kapt")
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":api"))
+    implementation(project(":compiler-common"))
     compileOnly(deps.auto.service.api)
     kapt(deps.auto.service.compiler)
 
@@ -13,18 +14,9 @@ dependencies {
     kapt(deps.incap.compiler)
     implementation(deps.auto.common)
 
-    testImplementation(platform(deps.junit.bom))
-    testImplementation(deps.junit.jupiter)
-    testImplementation(deps.truth)
-    testImplementation(deps.compileTesting)
+    testImplementation(deps.compileTesting.core)
+    testImplementation(project(":compiler-test"))
     testImplementation(gradleApi())
 }
 
 kapt.includeCompileClasspath = false
-
-tasks.test {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
-    }
-}

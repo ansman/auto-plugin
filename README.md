@@ -47,17 +47,37 @@ apply(plugin = "my-plugin")
 
 Setup
 ---
-To get started you'll need to include the api as regular dependency and the compiler as an annotation processor:
+
+### KSP
+If using Kotlin it's preferred to use the Gradle plugin which will use [KSP](https://github.com/google/ksp) to generate
+the file:
 ```kotlin
-dependencies {
-  implementation("se.ansman.autoplugin:api:0.1.1")
-  kapt("se.ansman.autoplugin:compile:0.1.1")
-  // For non kotlin projects you'll use something like this
-  annotationsProcessor("se.ansman.autoplugin:compile:0.1.1")
+plugins {
+  kotlin("jvm")
+  id("symbol-processing") version "<version>"
+  id("se.ansman.autoplugin") version "0.1.1"
+}
+
+// You can optionally configure it:
+autoPlugin {
+  // By default he plugin verifies that the Plugin ID is valid. If there are issues with the validation it can
+  // be disabled like this.
+  verificationEnabled.set(false)
 }
 ```
 
-Then simply annotate each plugin with `@AutoPlugin` and assign it an ID.
+If you do not want to use the plugin you need to duplicate [what the plugin does](https://github.com/ansman/auto-plugin/tree/main/gradle-plugin/src/main/kotlin/se/ansman/autoplugin/gradle/AutoPluginGradlePlugin.kt).
+
+### Annotations Processing
+If you aren't using Kotlin or does not want to use KSP you can add it as an annotation processor:
+```kotlin
+dependencies {
+  implementation("se.ansman.autoplugin:api:0.1.1")
+  annotationsProcessor("se.ansman.autoplugin:compile:0.1.1")
+  // For kotlin projects you'll use this instead
+  kapt("se.ansman.autoplugin:compile:0.1.1")
+}
+```
 
 Attribution
 ---

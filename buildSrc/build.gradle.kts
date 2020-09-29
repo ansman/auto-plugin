@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    val kotlinVersion = providers.gradleProperty("kotlinVersion").forUseAtConfigurationTime().get()
+    val kotlinVersion = "1.4.10"
     api("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     api("org.jetbrains.dokka:dokka-gradle-plugin:$kotlinVersion")
     api("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
@@ -22,6 +22,10 @@ gradlePlugin {
         register("library") {
             id = name
             implementationClass = "se.ansman.autoplugin.gradle.LibraryPlugin"
+        }
+        register("published-library") {
+            id = name
+            implementationClass = "se.ansman.autoplugin.gradle.PublishedLibraryPlugin"
         }
     }
 }

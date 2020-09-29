@@ -14,31 +14,31 @@
 
 package se.ansman.autoplugin.gradle
 
-import com.jfrog.bintray.gradle.BintrayExtension
+import deps
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.jvm.tasks.Jar
+import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import java.util.*
 
-@Suppress("UnstableApiUsage")
 abstract class LibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.jvm")
-            plugins.apply("org.jetbrains.dokka")
-            plugins.apply("maven-publish")
-            plugins.apply("com.jfrog.bintray")
-            group = "se.ansman.autoplugin"
-            version = providers.gradleProperty("version").forUseAtConfigurationTime().get()
 
             extensions.configure(JavaPluginExtension::class.java) {
                 it.sourceCompatibility = JavaVersion.VERSION_1_8
                 it.targetCompatibility = JavaVersion.VERSION_1_8
+            }
+
+            with(dependencies) {
+                add("testImplementation", platform(deps.junit.bom))
+            }
+
+            tasks.named("test", Test::class.java) { test ->
+                test.useJUnitPlatform()
+                test.testLogging.events("passed", "skipped", "failed")
             }
 
             extensions.configure<KotlinJvmProjectExtension>("kotlin") { kotlin ->
@@ -46,96 +46,6 @@ abstract class LibraryPlugin : Plugin<Project> {
                     it.kotlinOptions.jvmTarget = "1.8"
                 }
             }
-
-            val sourcesJar = tasks.register("sourcesJar", Jar::class.java) { task ->
-                task.from(project.sourceSets.getByName("main").allSource)
-                task.archiveClassifier.set("sources")
-            }
-
-            val dokkaJar = tasks.register("dokkaJar", Jar::class.java) { task ->
-                task.from(tasks.named("dokkaJavadoc"))
-                task.archiveClassifier.set("javadoc")
-            }
-
-            val publication = publishing.publications.register("library", MavenPublication::class.java) { publication ->
-                publication.from(project.components.getByName("java"))
-                publication.artifactId = project.path.removePrefix(":").replace(':', '-')
-                publication.artifact(sourcesJar)
-                publication.artifact(dokkaJar)
-
-                with(publication.pom) {
-                    name.set("AutoPlugin")
-                    description.set("Generates configuration files for Gradle Plugins.")
-                    url.set("https://github.com/ansman/auto-plugin")
-                    issueManagement {
-                        it.system.set("GitHub Issues")
-                        it.url.set("https://github.com/ansman/auto-plugin/issues")
-                    }
-                    licenses {
-                        it.license { license ->
-                            license.name.set("Apache 2.0")
-                            license.url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                        }
-                    }
-                    developers {
-                        it.developer { developer ->
-                            developer.id.set("nicklas.ansman")
-                            developer.name.set("Nicklas Ansman Giertz")
-                            developer.email.set("nicklas@ansman.se")
-                        }
-                    }
-                    scm { scm ->
-                        scm.url.set("https://github.com/ansman/auto-plugin")
-                        scm.connection.set("scm:git:git://github.com/ansman/auto-plugin.git")
-                        scm.developerConnection.set("scm:git:ssh://github.com/ansman/auto-plugin.git")
-                    }
-                }
-            }
-
-            extensions.configure<BintrayExtension>("bintray") { bintray ->
-                with(bintray) {
-                    user = providers.gradleProperty("BINTRAY_USER").forUseAtConfigurationTime().orNull
-                    key = providers.gradleProperty("BINTRAY_API_KEY").forUseAtConfigurationTime().orNull
-                    setPublications(publication.name)
-                    with(pkg) {
-                        val pub = publication.get()
-                        val pom = pub.pom
-                        repo = "auto-plugin"
-                        name = pub.artifactId
-                        desc = pom.description.get()
-                        issueTrackerUrl = "https://github.com/ansman/auto-plugin/issues"
-                        websiteUrl = pom.url.get()
-                        vcsUrl = pom.url.get()
-                        publish = true
-                        publicDownloadNumbers = true
-                        with(version) {
-                            desc = pom.description.get()
-                            released = Date().toString()
-                            with(gpg) {
-                                sign = true
-                                passphrase = providers.gradleProperty("BINTRAY_GPG_PASSWORD").forUseAtConfigurationTime().orNull
-                            }
-                        }
-                    }
-                }
-            }
-
-            tasks.named("bintrayUpload") {
-                it.doLast { printPublishedPublications() }
-            }
-
-            tasks.named("publishToMavenLocal") {
-                it.doLast { printPublishedPublications() }
-            }
         }
-    }
-
-    private fun Project.printPublishedPublications() {
-        extensions.getByType(PublishingExtension::class.java)
-            .publications
-            .filterIsInstance<MavenPublication>()
-            .forEach { publication ->
-                println("Published artifact ${publication.groupId}:${publication.artifactId}:${publication.version}")
-            }
     }
 }

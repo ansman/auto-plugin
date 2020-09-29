@@ -19,6 +19,8 @@ import com.google.auto.service.AutoService
 import net.ltgt.gradle.incap.IncrementalAnnotationProcessor
 import net.ltgt.gradle.incap.IncrementalAnnotationProcessorType
 import se.ansman.autoplugin.AutoPlugin
+import se.ansman.autoplugin.compiler.AutoPluginHelpers.Errors
+import se.ansman.autoplugin.compiler.AutoPluginHelpers.writeResourceFile
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -32,7 +34,6 @@ import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic.Kind
 import javax.tools.StandardLocation
 
-
 @Suppress("UnstableApiUsage")
 @AutoService(Processor::class)
 @IncrementalAnnotationProcessor(IncrementalAnnotationProcessorType.ISOLATING)
@@ -42,7 +43,7 @@ class AutoPluginProcessor : AbstractProcessor() {
      *
      * For example
      * ```
-     * "libraru" -> "com.example.LibraryPlugin"
+     * "library" -> "com.example.LibraryPlugin"
      * ```
      */
     private val providers = mutableMapOf<String, TypeElement>()
@@ -89,51 +90,26 @@ class AutoPluginProcessor : AbstractProcessor() {
             val autoPlugin = typeElement.getAnnotation(AutoPlugin::class.java)
             val pluginId = autoPlugin.value
 
-            if (!validatePluginId(pluginId)) {
-                error("""
-                    Plugin ID $pluginId is not valid. Plugin IDs must:
-                      • Only contain alphanumeric characters, '.', and '-'.
-                      • Not start or end with a '.' character.
-                      • Not contain consecutive '.' characters (i.e. '..').
-                """.trimIndent(), e)
+            if (!AutoPluginHelpers.validatePluginId(pluginId) { log(it) }) {
+                error(Errors.pluginIdFormat(pluginId), e)
                 continue
             }
 
             if (!processingEnv.typeUtils.isAssignable(typeElement.asType(), plugin)) {
-                error("Plugins must extend $GRADLE_PLUGIN", e)
+                error(Errors.missingSuperclass(typeElement.getBinaryName()), e)
                 continue
             }
-            val existing = providers[pluginId]
+            val existing = providers.put(pluginId, typeElement)
             if (existing != null) {
-                error("Plugin IDs must be unique. $existing uses the same plugin ID.", e)
+                error("Multiple plugins found with the same ID: '$pluginId' ($existing also implements it)", e)
             }
-            providers[pluginId] = typeElement
         }
-    }
-
-    private val validPluginCharacters = Regex("[a-zA-Z0-9.-]+")
-    private fun validatePluginId(pluginId: String): Boolean {
-        if (!validPluginCharacters.matches(pluginId)) {
-            log("Plugin ID $pluginId has invalid characters")
-            return false
-        }
-
-        if (pluginId.first() == '.' || pluginId.last() == '.') {
-            log("Plugin ID $pluginId starts or ends with .")
-            return false
-        }
-
-        if (".." in pluginId) {
-            log("Plugin ID $pluginId contains ..")
-            return false
-        }
-        return true
     }
 
     private fun generateConfigFiles() {
         val filer = processingEnv.filer
         for ((id, implementationClass) in providers.entries) {
-            val resourceFile = "META-INF/gradle-plugins/$id.properties"
+            val resourceFile = AutoPluginHelpers.fileNameForPluginId(id)
             log("Working on resource file: $resourceFile")
 
             try {
@@ -150,7 +126,7 @@ class AutoPluginProcessor : AbstractProcessor() {
             try {
                 filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceFile, implementationClass)
                     .openWriter()
-                    .use { it.write("implementation-class=${implementationClass.getBinaryName()}") }
+                    .use { it.writeResourceFile(implementationClass.getBinaryName()) }
             } catch (e: IOException) {
                 fatalError("Unable to create $resourceFile, $e", implementationClass)
             }
