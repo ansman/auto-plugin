@@ -2,10 +2,12 @@
 
 plugins {
     kotlin("jvm") version embeddedKotlinVersion
-    `java-gradle-plugin`
+    id("se.ansman.autoplugin") version "0.2.0"
+    id("symbol-processing") version "1.4.10-dev-experimental-20200924"
 }
 
 repositories {
+    google()
     mavenLocal()
     jcenter()
 }
@@ -15,17 +17,4 @@ dependencies {
     api("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     api("org.jetbrains.dokka:dokka-gradle-plugin:$kotlinVersion")
     api("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
-}
-
-gradlePlugin {
-    plugins {
-        register("library") {
-            id = name
-            implementationClass = "se.ansman.autoplugin.gradle.LibraryPlugin"
-        }
-        register("published-library") {
-            id = name
-            implementationClass = "se.ansman.autoplugin.gradle.PublishedLibraryPlugin"
-        }
-    }
 }

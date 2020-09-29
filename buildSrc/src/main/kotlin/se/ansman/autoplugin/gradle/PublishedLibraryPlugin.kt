@@ -20,10 +20,12 @@ import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.tasks.Jar
+import se.ansman.autoplugin.AutoPlugin
 import setupTestPublishing
 import java.util.*
 
 @Suppress("UnstableApiUsage")
+@AutoPlugin("published-library")
 abstract class PublishedLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -106,7 +108,8 @@ abstract class PublishedLibraryPlugin : Plugin<Project> {
                             released = Date().toString()
                             with(gpg) {
                                 sign = true
-                                passphrase = providers.gradleProperty("BINTRAY_GPG_PASSWORD").forUseAtConfigurationTime().orNull
+                                passphrase =
+                                    providers.gradleProperty("BINTRAY_GPG_PASSWORD").forUseAtConfigurationTime().orNull
                             }
                         }
                     }

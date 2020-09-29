@@ -21,7 +21,9 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import se.ansman.autoplugin.AutoPlugin
 
+@AutoPlugin("library")
 abstract class LibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
