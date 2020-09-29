@@ -55,7 +55,7 @@ the file:
 plugins {
   kotlin("jvm")
   id("symbol-processing") version "<version>"
-  id("se.ansman.autoplugin") version "0.1.1"
+  id("se.ansman.autoplugin") version "0.2.0"
 }
 
 // You can optionally configure it:
@@ -72,10 +72,10 @@ If you do not want to use the plugin you need to duplicate [what the plugin does
 If you aren't using Kotlin or does not want to use KSP you can add it as an annotation processor:
 ```kotlin
 dependencies {
-  implementation("se.ansman.autoplugin:api:0.1.1")
-  annotationsProcessor("se.ansman.autoplugin:compile:0.1.1")
+  implementation("se.ansman.autoplugin:api:0.2.0")
+  annotationsProcessor("se.ansman.autoplugin:compile:0.2.0")
   // For kotlin projects you'll use this instead
-  kapt("se.ansman.autoplugin:compile:0.1.1")
+  kapt("se.ansman.autoplugin:compile:0.2.0")
 }
 ```
 
