@@ -15,6 +15,14 @@
 @Suppress("ClassName", "SpellCheckingInspection", "MemberVisibilityCanBePrivate")
 object deps {
 
+    object kotlin {
+        object ksp {
+            const val version = "1.4.10-dev-experimental-20200924"
+            const val api = "com.google.devtools.ksp:symbol-processing-api:$version"
+            const val gradlePlugin = "com.google.devtools.ksp:symbol-processing:$version"
+        }
+    }
+
     object auto {
         const val common = "com.google.auto:auto-common:0.11"
         object service {
@@ -36,5 +44,11 @@ object deps {
     }
 
     const val truth = "com.google.truth:truth:1.0.1"
-    const val compileTesting = "com.github.tschuchortdev:kotlin-compile-testing:1.2.11"
+    object compileTesting {
+        const val version = "1.3.1"
+        const val core = "com.github.tschuchortdev:kotlin-compile-testing:$version"
+        const val ksp = "com.github.tschuchortdev:kotlin-compile-testing-ksp:$version"
+    }
+
+    const val kotlinPoet = "com.squareup:kotlinpoet:1.6.0"
 }

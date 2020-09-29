@@ -1,5 +1,5 @@
 plugins {
-    library
+    `published-library`
 }
 
 dependencies {

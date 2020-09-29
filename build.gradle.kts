@@ -1,8 +1,15 @@
-@file:Suppress("UnstableApiUsage")
+buildscript {
+    repositories {
+        jcenter()
+        google()
+        mavenLocal()
+    }
+}
 
 allprojects {
     repositories {
-        mavenLocal()
         jcenter()
+        google()
+        mavenLocal()
     }
 }
