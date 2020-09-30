@@ -41,7 +41,6 @@ internal class AutoPluginGradlePluginTest {
                   eachPlugin {
                     when (requested.id.id) {
                       "se.ansman.autoplugin" -> useModule("se.ansman.autoplugin:gradle-plugin:${'$'}{requested.version}")
-                      "symbol-processing" -> useModule("com.google.devtools.ksp:symbol-processing:${'$'}{requested.version}")
                     }
                   }
                 }
@@ -62,7 +61,6 @@ internal class AutoPluginGradlePluginTest {
                 """
                 plugins {
                   kotlin("jvm") version embeddedKotlinVersion
-                  id("symbol-processing") version "${System.getProperty("symbolProcessingVersion")}"
                   id("se.ansman.autoplugin") version "${System.getProperty("pluginVersion")}"
                 }
                     
@@ -83,6 +81,8 @@ internal class AutoPluginGradlePluginTest {
                   google()
                   jcenter()
                 }
+                
+                autoPlugin.applyKsp()
                 
                 dependencies {
                   implementation(gradleApi())
