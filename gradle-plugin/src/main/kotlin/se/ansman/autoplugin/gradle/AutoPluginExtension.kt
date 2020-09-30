@@ -14,15 +14,23 @@
 
 package se.ansman.autoplugin.gradle
 
-import org.gradle.api.provider.Property
+import com.google.devtools.ksp.gradle.KspExtension
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import javax.inject.Inject
 
 /**
  * Configures the [AutoPluginGradlePlugin].
  */
 @Suppress("LeakingThis", "UnstableApiUsage")
-abstract class AutoPluginExtension {
+public abstract class AutoPluginExtension @Inject constructor(private val project: Project) {
+    /** Enables verbose logging. By default only errors are logged. */
+    public fun verboseLogging(enabled: Boolean = true) {
+        setOption("verbose", enabled.toString())
+    }
+
     /**
-     * Whether verification of plugins and plugin ids is enabled.
+     * Disables verification of plugins and plugin ids.
      *
      * By default the compiler will verify certain things:
      * * The plugin must implement [Plugin].
@@ -32,19 +40,20 @@ abstract class AutoPluginExtension {
      *   * Must not contain two consecutive periods ('..').
      *   * Must contain at least one character.
      */
-    abstract val verificationEnabled: Property<Boolean>
+    public fun disableVerification() {
+        setOption("verify", false.toString())
+    }
 
-    /** Enables verbose logging. By default only errors are logged. */
-    abstract val verboseLogging: Property<Boolean>
+    /** Re-enabled verification after a previous call to [disableVerification]. */
+    public fun enableVerification() {
+        setOption("verify", true.toString())
+    }
 
-    init {
-        verificationEnabled.apply {
-            finalizeValueOnRead()
-            convention(true)
-        }
-        verboseLogging.apply {
-            finalizeValueOnRead()
-            convention(false)
+    private fun setOption(name: String, value: String) {
+        project.pluginManager.withPlugin("symbol-processing") {
+            project.extensions.configure<KspExtension>("ksp") {
+                it.arg("autoPlugin.$name", value)
+            }
         }
     }
 }

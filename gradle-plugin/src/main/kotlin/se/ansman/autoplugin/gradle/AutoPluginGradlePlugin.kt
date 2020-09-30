@@ -14,7 +14,6 @@
 
 package se.ansman.autoplugin.gradle
 
-import com.google.devtools.ksp.gradle.KspExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -29,10 +28,10 @@ import se.ansman.autoplugin.compiler.BuildMetadata
  * * Add a `ksp` dependency on the AutoPlugin compiler
  */
 @AutoPlugin("se.ansman.autoplugin")
-abstract class AutoPluginGradlePlugin : Plugin<Project> {
+public abstract class AutoPluginGradlePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            val extension = extensions.create("autoPlugin", AutoPluginExtension::class.java)
+            extensions.create("autoPlugin", AutoPluginExtension::class.java, target)
 
             pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
                 with(property("sourceSets") as SourceSetContainer) {
@@ -45,12 +44,6 @@ abstract class AutoPluginGradlePlugin : Plugin<Project> {
             pluginManager.withPlugin("symbol-processing") {
                 dependencies.add("implementation", "se.ansman.autoplugin:api:${BuildMetadata.VERSION}")
                 dependencies.add("ksp", "se.ansman.autoplugin:compiler-ksp:${BuildMetadata.VERSION}")
-                afterEvaluate {
-                    extensions.configure<KspExtension>("ksp") {
-                        it.arg("autoPlugin.verify", extension.verificationEnabled.get().toString())
-                        it.arg("autoPlugin.verbose", extension.verboseLogging.get().toString())
-                    }
-                }
             }
         }
     }

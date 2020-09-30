@@ -40,6 +40,7 @@ internal class AutoPluginGradlePluginTest {
                 resolutionStrategy {
                   eachPlugin {
                     when (requested.id.id) {
+                      "se.ansman.autoplugin" -> useModule("se.ansman.autoplugin:gradle-plugin:${'$'}{requested.version}")
                       "symbol-processing" -> useModule("com.google.devtools.ksp:symbol-processing:${'$'}{requested.version}")
                     }
                   }
@@ -62,6 +63,7 @@ internal class AutoPluginGradlePluginTest {
                 plugins {
                   kotlin("jvm") version embeddedKotlinVersion
                   id("symbol-processing") version "${System.getProperty("symbolProcessingVersion")}"
+                  id("se.ansman.autoplugin") version "${System.getProperty("pluginVersion")}"
                 }
                     
                 buildscript {
@@ -71,10 +73,6 @@ internal class AutoPluginGradlePluginTest {
                     }
                     google()
                     jcenter()
-                  }
-                  
-                  dependencies {
-                    classpath("se.ansman.autoplugin:gradle-plugin:${System.getProperty("pluginVersion")}")
                   }
                 }
                 
@@ -86,11 +84,10 @@ internal class AutoPluginGradlePluginTest {
                   jcenter()
                 }
                 
-                apply(plugin = "se.ansman.autoplugin")
-                
                 dependencies {
                   implementation(gradleApi())
                 }
+                
                 """.trimIndent()
             )
         }
@@ -101,6 +98,7 @@ internal class AutoPluginGradlePluginTest {
         GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("--stacktrace")
+            .forwardOutput()
             .build()
     }
 
@@ -126,6 +124,7 @@ internal class AutoPluginGradlePluginTest {
         GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("--stacktrace", "compileKotlin")
+            .forwardOutput()
             .build()
 
         val propertiesFile =
@@ -155,9 +154,8 @@ internal class AutoPluginGradlePluginTest {
         GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("--stacktrace", "jar")
+            .forwardOutput()
             .build()
-
-
 
         val uri = URI.create("jar:file:${testProjectDir.resolve("build/libs/test.jar")}")
         val contents = FileSystems.newFileSystem(uri, emptyMap<String, Any?>()).use { fs ->
@@ -166,5 +164,36 @@ internal class AutoPluginGradlePluginTest {
             }
         }
         assertThat(contents).isEqualTo("implementation-class=com.example.ExamplePlugin")
+    }
+
+    @Test
+    fun `without verification`() {
+        buildFile.appendText("""
+            autoPlugin {
+              disableVerification()
+            }
+        """.trimIndent())
+        testProjectDir.resolve("src/main/kotlin/com/example")
+            .apply { check(mkdirs()) }
+            .resolve("ExamplePlugin.kt")
+            .writeText(
+                """
+                package com.example
+                
+                import se.ansman.autoplugin.AutoPlugin
+                
+                @AutoPlugin(".some..invalid_id!")
+                class ExamplePlugin
+            """.trimIndent()
+            )
+
+        GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("--stacktrace", "compileKotlin")
+            .forwardOutput()
+            .build()
+
+        val propertiesFile = testProjectDir.resolve("build/generated/ksp/src/main/resources/META-INF/gradle-plugins/.some..invalid_id!.properties")
+        assertThat(propertiesFile.readText()).isEqualTo("implementation-class=com.example.ExamplePlugin")
     }
 }
