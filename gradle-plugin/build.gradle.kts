@@ -31,7 +31,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     compileOnly(project(":api"))
     implementation(gradleApi())
-    compileOnly(deps.kotlin.ksp.gradlePlugin)
+    implementation(deps.kotlin.ksp.gradlePlugin)
     ksp(project(":compiler-ksp"))
 
     "funcTestImplementation"(project(":api"))

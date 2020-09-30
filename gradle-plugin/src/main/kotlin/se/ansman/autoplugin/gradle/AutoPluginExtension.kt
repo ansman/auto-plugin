@@ -15,6 +15,7 @@
 package se.ansman.autoplugin.gradle
 
 import com.google.devtools.ksp.gradle.KspExtension
+import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import javax.inject.Inject
@@ -55,5 +56,10 @@ public abstract class AutoPluginExtension @Inject constructor(private val projec
                 it.arg("autoPlugin.$name", value)
             }
         }
+    }
+
+    /** Call this to automatically apply the KSP Gradle Plugin. */
+    public fun applyKsp() {
+        project.pluginManager.apply(KspGradleSubplugin::class.java)
     }
 }
