@@ -87,6 +87,17 @@ abstract class PublishedLibraryPlugin : Plugin<Project> {
                 add("archives", sourcesJar)
             }
 
+            publishing.repositories.maven { maven ->
+                maven.name = "snapshots"
+                target.afterEvaluate {
+                    maven.url = target.uri("https://oss.jfrog.org/artifactory/oss-snapshot-local")
+                    maven.credentials {
+                        it.username = providers.gradleProperty("BINTRAY_USER").forUseAtConfigurationTime().orNull
+                        it.password = providers.gradleProperty("BINTRAY_API_KEY").forUseAtConfigurationTime().orNull
+                    }
+                }
+            }
+
             extensions.configure<BintrayExtension>("bintray") { bintray ->
                 with(bintray) {
                     user = providers.gradleProperty("BINTRAY_USER").forUseAtConfigurationTime().orNull
