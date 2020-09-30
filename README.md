@@ -97,6 +97,8 @@ Attribution
 ---
 This library is heavily influenced by [Auto Service](https://github.com/google/auto/tree/master/service).
 
+The KSP implementation is based on [auto-service-ksp](https://github.com/ZacSweers/auto-service-ksp).
+
 License
 ---
 ```plain
