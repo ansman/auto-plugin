@@ -53,20 +53,34 @@ If using Kotlin it's preferred to use the Gradle plugin which will use [KSP](htt
 the file:
 ```kotlin
 plugins {
-  kotlin("jvm")
-  id("symbol-processing") version "<version>"
   id("se.ansman.autoplugin") version "0.3.0"
 }
 
 // You can optionally configure it:
 autoPlugin {
-  // By default he plugin verifies that the Plugin ID is valid. If there are issues with the validation it can
-  // be disabled like this.
-  verificationEnabled.set(false)
+  // This applies the KSP Gradle Plugin for you. This is optional, but you need to apply the KSP plugin manually if
+  // you don't call this.
+  applyKsp()
+
+  // You can later call enableVerification() to re-enable it
+  disableVerification()
+  
+  // You can later call verboseLogging(enabled = false) to disable verbose logging
+  verboseLogging()
 }
 ```
 
-If you do not want to use the plugin you need to duplicate [what the plugin does](https://github.com/ansman/auto-plugin/tree/main/gradle-plugin/src/main/kotlin/se/ansman/autoplugin/gradle/AutoPluginGradlePlugin.kt).
+If you do not want to use the Gradle Plugin you need to set everything up yourself:
+* Apply the KSP plugin.
+* Add `build/generated/ksp/src/main/resources` to your `main` source set.
+* Optionally you can pass the KSP compiler options `autoPlugin.verify` and/or `autoPlugin.verbose` (both are booleans).
+* Add the required dependencies:
+```kotlin
+dependencies {
+  implementation("se.ansman.autoplugin:api:0.3.0")
+  ksp("se.ansman.autoplugin:compiler-ksp:0.3.0")
+}
+```
 
 ### Annotations Processing
 If you aren't using Kotlin or does not want to use KSP you can add it as an annotation processor:
