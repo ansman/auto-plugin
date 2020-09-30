@@ -14,6 +14,10 @@ buildscript {
     }
 }
 
+kotlin {
+    explicitApi()
+}
+
 val funcTestSourceSet: NamedDomainObjectProvider<SourceSet> = sourceSets.register("funcTest") {
     java.srcDir(file("src/funcTest/kotlin"))
     resources.srcDir(file("src/funcTest/resources"))
