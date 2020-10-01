@@ -53,7 +53,7 @@ If using Kotlin it's preferred to use the Gradle plugin which will use [KSP](htt
 the file:
 ```kotlin
 plugins {
-  id("se.ansman.autoplugin") version "0.3.0"
+  id("se.ansman.autoplugin") version "0.4.0"
 }
 
 // You can optionally configure it:
@@ -64,7 +64,7 @@ autoPlugin {
 
   // You can later call enableVerification() to re-enable it
   disableVerification()
-  
+
   // You can later call verboseLogging(enabled = false) to disable verbose logging
   verboseLogging()
 }
@@ -78,8 +78,8 @@ If you do not want to use the Gradle Plugin you need to set everything up yourse
 * Add the required dependencies:
 ```kotlin
 dependencies {
-  implementation("se.ansman.autoplugin:api:0.3.0")
-  ksp("se.ansman.autoplugin:compiler:0.3.0")
+  implementation("se.ansman.autoplugin:api:0.4.0")
+  ksp("se.ansman.autoplugin:compiler:0.4.0")
 }
 ```
 
@@ -87,10 +87,10 @@ dependencies {
 If you aren't using Kotlin or does not want to use KSP you can add it as an annotation processor:
 ```kotlin
 dependencies {
-  implementation("se.ansman.autoplugin:api:0.3.0")
-  annotationsProcessor("se.ansman.autoplugin:compile:0.3.0")
+  implementation("se.ansman.autoplugin:api:0.4.0")
+  annotationsProcessor("se.ansman.autoplugin:compile:0.4.0")
   // For kotlin projects you'll use this instead
-  kapt("se.ansman.autoplugin:compile:0.3.0")
+  kapt("se.ansman.autoplugin:compile:0.4.0")
 }
 ```
 
