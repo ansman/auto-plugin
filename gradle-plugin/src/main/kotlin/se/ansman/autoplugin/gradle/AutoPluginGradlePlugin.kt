@@ -39,10 +39,10 @@ public abstract class AutoPluginGradlePlugin : Plugin<Project> {
                         resources.srcDir(target.layout.buildDirectory.dir("generated/ksp/src/main/resources"))
                     }
                 }
+                dependencies.add("implementation", "se.ansman.autoplugin:api:${BuildMetadata.VERSION}")
             }
 
             pluginManager.withPlugin("symbol-processing") {
-                dependencies.add("implementation", "se.ansman.autoplugin:api:${BuildMetadata.VERSION}")
                 dependencies.add("ksp", "se.ansman.autoplugin:compiler-ksp:${BuildMetadata.VERSION}")
             }
         }
