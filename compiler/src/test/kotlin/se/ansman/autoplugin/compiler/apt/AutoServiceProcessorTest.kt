@@ -11,10 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.ansman.autoplugin.compiler
+package se.ansman.autoplugin.compiler.apt
 
 import com.tschuchort.compiletesting.KotlinCompilation
-import se.ansman.autoplugin.compiler.test.BaseAutoPluginProcessorTest
+import se.ansman.autoplugin.compiler.BaseAutoPluginProcessorTest
 import java.io.FileNotFoundException
 
 /** Tests the [AutoPluginProcessor]. */

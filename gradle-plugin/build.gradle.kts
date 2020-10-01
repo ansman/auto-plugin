@@ -32,7 +32,7 @@ dependencies {
     compileOnly(project(":api"))
     implementation(gradleApi())
     implementation(deps.kotlin.ksp.gradlePlugin)
-    ksp(project(":compiler-ksp"))
+    ksp(project(":compiler"))
 
     "funcTestImplementation"(project(":api"))
     "funcTestImplementation"(platform(deps.junit.bom))
@@ -103,14 +103,12 @@ val funcTest = tasks.register("funcTest", Test::class.java) {
     dependsOn(
         "publishTestLibraryPublicationToTestRepository",
         ":api:publishTestLibraryPublicationToTestRepository",
-        ":compiler-common:publishTestLibraryPublicationToTestRepository",
-        ":compiler-ksp:publishTestLibraryPublicationToTestRepository"
+        ":compiler:publishTestLibraryPublicationToTestRepository"
     )
     val pluginVersion = providers.gradleProperty("version")
         .forUseAtConfigurationTime()
         .get()
     systemProperty("pluginVersion", pluginVersion)
-    systemProperty("symbolProcessingVersion", deps.kotlin.ksp.version)
     systemProperty("localMavenRepo", testMavenRepo.absolutePath)
 }
 

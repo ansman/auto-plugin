@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.ansman.autoplugin.compiler
+package se.ansman.autoplugin.compiler.ksp
 
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.kspSourcesDir
 import com.tschuchort.compiletesting.symbolProcessors
-import se.ansman.autoplugin.compiler.test.BaseAutoPluginProcessorTest
+import se.ansman.autoplugin.compiler.BaseAutoPluginProcessorTest
 
 /** Tests the [AutoPluginSymbolProcessorTest]. */
 class AutoPluginSymbolProcessorTest : BaseAutoPluginProcessorTest() {

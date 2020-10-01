@@ -79,7 +79,7 @@ If you do not want to use the Gradle Plugin you need to set everything up yourse
 ```kotlin
 dependencies {
   implementation("se.ansman.autoplugin:api:0.3.0")
-  ksp("se.ansman.autoplugin:compiler-ksp:0.3.0")
+  ksp("se.ansman.autoplugin:compiler:0.3.0")
 }
 ```
 

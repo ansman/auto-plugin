@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package se.ansman.autoplugin.compiler
+package se.ansman.autoplugin.compiler.ksp
 
 import com.google.auto.service.AutoService
 import com.google.devtools.ksp.isLocal
@@ -25,14 +25,15 @@ import com.google.devtools.ksp.symbol.KSNode
 import com.squareup.kotlinpoet.ClassName
 import org.jetbrains.kotlin.analyzer.AnalysisResult.CompilationErrorException
 import se.ansman.autoplugin.AutoPlugin
-import se.ansman.autoplugin.compiler.AutoPluginHelpers.Errors
-import se.ansman.autoplugin.compiler.AutoPluginHelpers.validatePluginId
-import se.ansman.autoplugin.compiler.AutoPluginHelpers.writeResourceFile
+import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers
+import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers.validatePluginId
+import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers.writeResourceFile
+import se.ansman.autoplugin.compiler.internal.Errors
 import java.io.IOException
 
 
 @AutoService(SymbolProcessor::class)
-class AutoPluginSymbolProcessor : SymbolProcessor {
+internal class AutoPluginSymbolProcessor : SymbolProcessor {
     private lateinit var codeGenerator: CodeGenerator
     private lateinit var logger: KSPLogger
     private var verify = false

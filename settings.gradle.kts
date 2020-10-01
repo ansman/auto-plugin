@@ -17,7 +17,4 @@ rootProject.name = "auto-plugin"
 
 include(":api")
 include(":compiler")
-include(":compiler-ksp")
-include(":compiler-common")
-include(":compiler-test")
 include(":gradle-plugin")

@@ -12,17 +12,17 @@
  * limitations under the License.
  */
 
-package se.ansman.autoplugin.compiler
+package se.ansman.autoplugin.compiler.internal
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
-import se.ansman.autoplugin.compiler.AutoPluginHelpers.fileNameForPluginId
-import se.ansman.autoplugin.compiler.AutoPluginHelpers.validatePluginId
-import se.ansman.autoplugin.compiler.AutoPluginHelpers.writeResourceFile
+import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers.fileNameForPluginId
+import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers.validatePluginId
+import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers.writeResourceFile
 import java.io.StringWriter
 
-internal class AutoPluginHelpersTest {
+class AutoPluginHelpersTest {
     @Test
     fun `plugin ID is valid`() {
         val logger = { _: String -> fail("Should not log anything") }
