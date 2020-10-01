@@ -18,12 +18,12 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
 import se.ansman.autoplugin.AutoPlugin
-import se.ansman.autoplugin.compiler.BuildMetadata
 
 /**
  * The plugin for AutoPlugin. Will do the following things:
  * * Install the [AutoPluginExtension] with the name `autoPlugin`
  * * Add `build/generated/ksp/src/main/resources` to the main source set
+ * * Make the `processResources` task depend on the `compileKotlin` task
  * * Add an `implementation` dependency on the API
  * * Add a `ksp` dependency on the AutoPlugin compiler
  */
@@ -40,6 +40,12 @@ public abstract class AutoPluginGradlePlugin : Plugin<Project> {
                     }
                 }
                 dependencies.add("implementation", "se.ansman.autoplugin:api:${BuildMetadata.VERSION}")
+
+                // By default `processResources` doesn't depend on `compileKotlin` so by the time the resource file
+                // is generated the resources can have already been processed. This ensures the file is generated first.
+                tasks.named("processResources").configure {
+                    it.dependsOn("compileKotlin")
+                }
             }
 
             pluginManager.withPlugin("symbol-processing") {

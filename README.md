@@ -74,6 +74,7 @@ If you do not want to use the Gradle Plugin you need to set everything up yourse
 * Apply the KSP plugin.
 * Add `build/generated/ksp/src/main/resources` to your `main` source set.
 * Optionally you can pass the KSP compiler options `autoPlugin.verify` and/or `autoPlugin.verbose` (both are booleans).
+* Make the `processResources` task depend on the `compileKotlin` task
 * Add the required dependencies:
 ```kotlin
 dependencies {

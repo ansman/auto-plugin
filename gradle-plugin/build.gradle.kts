@@ -77,7 +77,7 @@ val generateBuildMetadata = tasks.register("generateBuildMetadata") {
     inputs.property("version", version)
     outputs.dir(generatedBuildDir)
     doFirst {
-        FileSpec.builder("se.ansman.autoplugin.compiler", "BuildMetadata")
+        FileSpec.builder("se.ansman.autoplugin.gradle", "BuildMetadata")
             .addType(
                 TypeSpec.objectBuilder("BuildMetadata")
                     .addModifiers(KModifier.INTERNAL)
@@ -115,3 +115,11 @@ val funcTest = tasks.register("funcTest", Test::class.java) {
 }
 
 tasks.named("check") { dependsOn(funcTest) }
+
+sourceSets.main.configure {
+    resources.srcDir(layout.buildDirectory.dir("generated/ksp/src/main/resources"))
+}
+
+tasks.named("processResources").configure {
+    dependsOn("compileKotlin")
+}
