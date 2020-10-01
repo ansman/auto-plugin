@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.ansman.autoplugin.compiler.test
+package se.ansman.autoplugin.compiler
 
 import com.google.common.truth.Truth.assertThat
 import com.tschuchort.compiletesting.KotlinCompilation
@@ -20,13 +20,12 @@ import com.tschuchort.compiletesting.KotlinCompilation.ExitCode.OK
 import com.tschuchort.compiletesting.SourceFile
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
-import se.ansman.autoplugin.compiler.AutoPluginHelpers.Errors
+import se.ansman.autoplugin.compiler.internal.Errors
 import java.io.ByteArrayOutputStream
 import java.io.FilterOutputStream
 import java.io.IOException
 import java.io.PrintStream
 
-@Suppress("FunctionName")
 abstract class BaseAutoPluginProcessorTest {
     @Test
     fun `resource file should be generated`() {

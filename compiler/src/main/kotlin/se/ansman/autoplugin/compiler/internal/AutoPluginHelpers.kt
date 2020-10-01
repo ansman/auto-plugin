@@ -12,12 +12,12 @@
  * limitations under the License.
  */
 
-package se.ansman.autoplugin.compiler
+package se.ansman.autoplugin.compiler.internal
 
 import java.io.Writer
 
 
-object AutoPluginHelpers {
+internal object AutoPluginHelpers {
     private val validPluginCharacters = Regex("[a-zA-Z0-9.-]+")
 
     fun validatePluginId(pluginId: String, logger: (String) -> Unit = {}): Boolean {
@@ -46,23 +46,5 @@ object AutoPluginHelpers {
 
     fun Writer.writeResourceFile(implementationClass: String) {
         write("implementation-class=$implementationClass")
-    }
-
-    object Errors {
-        fun pluginIdFormat(pluginId: String): String =
-            """
-                Gradle plugin ID '$pluginId' is not valid. Plugin IDs must:
-                  • Contain at least one character
-                  • Only contain alphanumeric characters, '.', and '-'.
-                  • Not start or end with a '.' character.
-                  • Not contain consecutive '.' characters (i.e. '..').
-            """.trimIndent()
-
-        fun duplicatePlugins(pluginId: String, existingImplementation: String): String =
-            "Multiple plugins found with the same ID: '$pluginId' ($existingImplementation also implements it)"
-
-
-        fun missingSuperclass(implementationClass: String): String =
-            "Class $implementationClass does not implement org.gradle.api.Plugin. All classes annotated with @AutoPlugin must be a Gradle Plugin."
     }
 }

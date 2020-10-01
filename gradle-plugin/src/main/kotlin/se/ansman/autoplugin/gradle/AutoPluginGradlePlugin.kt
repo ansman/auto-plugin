@@ -49,7 +49,7 @@ public abstract class AutoPluginGradlePlugin : Plugin<Project> {
             }
 
             pluginManager.withPlugin("symbol-processing") {
-                dependencies.add("ksp", "se.ansman.autoplugin:compiler-ksp:${BuildMetadata.VERSION}")
+                dependencies.add("ksp", "se.ansman.autoplugin:compiler:${BuildMetadata.VERSION}")
             }
         }
     }

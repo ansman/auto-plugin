@@ -12,15 +12,16 @@
  * limitations under the License.
  */
 
-package se.ansman.autoplugin.compiler
+package se.ansman.autoplugin.compiler.apt
 
 import com.google.auto.common.MoreElements
 import com.google.auto.service.AutoService
 import net.ltgt.gradle.incap.IncrementalAnnotationProcessor
 import net.ltgt.gradle.incap.IncrementalAnnotationProcessorType
 import se.ansman.autoplugin.AutoPlugin
-import se.ansman.autoplugin.compiler.AutoPluginHelpers.Errors
-import se.ansman.autoplugin.compiler.AutoPluginHelpers.writeResourceFile
+import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers
+import se.ansman.autoplugin.compiler.internal.Errors
+import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers.writeResourceFile
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -37,7 +38,7 @@ import javax.tools.StandardLocation
 @Suppress("UnstableApiUsage")
 @AutoService(Processor::class)
 @IncrementalAnnotationProcessor(IncrementalAnnotationProcessorType.ISOLATING)
-class AutoPluginProcessor : AbstractProcessor() {
+internal class AutoPluginProcessor : AbstractProcessor() {
     /**
      * Maps plugin IDs to the implementing type.
      *
