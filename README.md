@@ -53,7 +53,7 @@ If using Kotlin it's preferred to use the Gradle plugin which will use [KSP](htt
 the file:
 ```kotlin
 plugins {
-  id("se.ansman.autoplugin") version "0.4.0"
+  id("se.ansman.autoplugin") version "0.4.1"
 }
 
 // You can optionally configure it:
@@ -78,8 +78,8 @@ If you do not want to use the Gradle Plugin you need to set everything up yourse
 * Add the required dependencies:
 ```kotlin
 dependencies {
-  implementation("se.ansman.autoplugin:api:0.4.0")
-  ksp("se.ansman.autoplugin:compiler:0.4.0")
+  implementation("se.ansman.autoplugin:api:0.4.1")
+  ksp("se.ansman.autoplugin:compiler:0.4.1")
 }
 ```
 
@@ -87,21 +87,21 @@ dependencies {
 If you aren't using Kotlin or does not want to use KSP you can add it as an annotation processor:
 ```kotlin
 dependencies {
-  implementation("se.ansman.autoplugin:api:0.4.0")
-  annotationsProcessor("se.ansman.autoplugin:compile:0.4.0")
+  implementation("se.ansman.autoplugin:api:0.4.1")
+  annotationsProcessor("se.ansman.autoplugin:compile:0.4.1")
   // For kotlin projects you'll use this instead
-  kapt("se.ansman.autoplugin:compile:0.4.0")
+  kapt("se.ansman.autoplugin:compile:0.4.1")
 }
 ```
 
 Options
 ---
 Both the KSP compiler and the AnnotationsProcessor support options:
-* `autoPlugin.verbose = true/false` - Enables verbose logging. Default is `false`. 
+* `autoPlugin.verbose = true/false` - Enables verbose logging. Default is `false`.
 * `autoPlugin.verify = true/false` - Enables verification. Default is `true`.
 
 The the documentation for the respective tools for information on how to pass them. The Gradle Plugin has these options
-in the extension. 
+in the extension.
 
 Snapshots
 ---
