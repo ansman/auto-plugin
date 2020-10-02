@@ -31,7 +31,7 @@ import se.ansman.autoplugin.AutoPlugin
 public abstract class AutoPluginGradlePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            extensions.create("autoPlugin", AutoPluginExtension::class.java, target)
+            val extension = extensions.create("autoPlugin", AutoPluginExtension::class.java, target)
 
             pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
                 with(property("sourceSets") as SourceSetContainer) {
@@ -39,7 +39,7 @@ public abstract class AutoPluginGradlePlugin : Plugin<Project> {
                         resources.srcDir(target.layout.buildDirectory.dir("generated/ksp/src/main/resources"))
                     }
                 }
-                dependencies.add("implementation", "se.ansman.autoplugin:api:${BuildMetadata.VERSION}")
+                dependencies.add("implementation", extension.version.map { "se.ansman.autoplugin:api:$it" })
 
                 // By default `processResources` doesn't depend on `compileKotlin` so by the time the resource file
                 // is generated the resources can have already been processed. This ensures the file is generated first.
@@ -49,7 +49,7 @@ public abstract class AutoPluginGradlePlugin : Plugin<Project> {
             }
 
             pluginManager.withPlugin("symbol-processing") {
-                dependencies.add("ksp", "se.ansman.autoplugin:compiler:${BuildMetadata.VERSION}")
+                dependencies.add("ksp", extension.version.map { "se.ansman.autoplugin:compiler:$it" })
             }
         }
     }
