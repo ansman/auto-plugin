@@ -14,14 +14,18 @@
 package se.ansman.autoplugin.compiler.ksp
 
 import com.tschuchort.compiletesting.KotlinCompilation
+import com.tschuchort.compiletesting.kspArgs
 import com.tschuchort.compiletesting.kspSourcesDir
 import com.tschuchort.compiletesting.symbolProcessors
 import se.ansman.autoplugin.compiler.BaseAutoPluginProcessorTest
 
 /** Tests the [AutoPluginSymbolProcessorTest]. */
 class AutoPluginSymbolProcessorTest : BaseAutoPluginProcessorTest() {
-    override fun KotlinCompilation.configure() {
+    override fun KotlinCompilation.configure(verify: Boolean) {
         symbolProcessors = listOf(AutoPluginSymbolProcessor())
+        if (!verify) {
+            kspArgs["autoPlugin.verify"] = verify.toString()
+        }
     }
 
     override fun getResourceAsText(
