@@ -87,21 +87,29 @@ abstract class PublishedLibraryPlugin : Plugin<Project> {
                 add("archives", sourcesJar)
             }
 
+
+            val bintrayUsername = providers.gradleProperty("BINTRAY_USER").forUseAtConfigurationTime()
+                .orElse(providers.environmentVariable("BINTRAY_USER").forUseAtConfigurationTime())
+                .orNull
+            val bintrayPassword = providers.gradleProperty("BINTRAY_API_KEY").forUseAtConfigurationTime()
+                .orElse(providers.environmentVariable("BINTRAY_API_KEY").forUseAtConfigurationTime())
+                .orNull
+
             publishing.repositories.maven { maven ->
                 maven.name = "snapshots"
                 target.afterEvaluate {
                     maven.url = target.uri("https://oss.jfrog.org/artifactory/oss-snapshot-local")
                     maven.credentials {
-                        it.username = providers.gradleProperty("BINTRAY_USER").forUseAtConfigurationTime().orNull
-                        it.password = providers.gradleProperty("BINTRAY_API_KEY").forUseAtConfigurationTime().orNull
+                        it.username = bintrayUsername
+                        it.password = bintrayPassword
                     }
                 }
             }
 
             extensions.configure<BintrayExtension>("bintray") { bintray ->
                 with(bintray) {
-                    user = providers.gradleProperty("BINTRAY_USER").forUseAtConfigurationTime().orNull
-                    key = providers.gradleProperty("BINTRAY_API_KEY").forUseAtConfigurationTime().orNull
+                    user = bintrayUsername
+                    key = bintrayPassword
                     setPublications(publication.name)
                     with(pkg) {
                         val pub = publication.get()
@@ -120,7 +128,9 @@ abstract class PublishedLibraryPlugin : Plugin<Project> {
                             with(gpg) {
                                 sign = true
                                 passphrase =
-                                    providers.gradleProperty("BINTRAY_GPG_PASSWORD").forUseAtConfigurationTime().orNull
+                                    providers.gradleProperty("BINTRAY_GPG_PASSWORD").forUseAtConfigurationTime()
+                                        .orElse(providers.environmentVariable("BINTRAY_GPG_PASSWORD").forUseAtConfigurationTime())
+                                        .orNull
                             }
                         }
                     }
