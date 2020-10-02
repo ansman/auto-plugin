@@ -20,14 +20,12 @@ import net.ltgt.gradle.incap.IncrementalAnnotationProcessor
 import net.ltgt.gradle.incap.IncrementalAnnotationProcessorType
 import se.ansman.autoplugin.AutoPlugin
 import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers
-import se.ansman.autoplugin.compiler.internal.Errors
 import se.ansman.autoplugin.compiler.internal.AutoPluginHelpers.writeResourceFile
+import se.ansman.autoplugin.compiler.internal.Errors
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
-import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.Processor
-import javax.annotation.processing.RoundEnvironment
+import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.PackageElement
@@ -38,6 +36,7 @@ import javax.tools.StandardLocation
 @Suppress("UnstableApiUsage")
 @AutoService(Processor::class)
 @IncrementalAnnotationProcessor(IncrementalAnnotationProcessorType.ISOLATING)
+@SupportedOptions(AutoPluginProcessor.OPTION_VERBOSE, AutoPluginProcessor.OPTION_VERIFY)
 internal class AutoPluginProcessor : AbstractProcessor() {
     /**
      * Maps plugin IDs to the implementing type.
@@ -49,34 +48,38 @@ internal class AutoPluginProcessor : AbstractProcessor() {
      */
     private val providers = mutableMapOf<String, TypeElement>()
 
+    private var verbose: Boolean = false
+    private var verify: Boolean = true
+
     override fun getSupportedAnnotationTypes(): Set<String> = setOf(AutoPlugin::class.java.name)
 
     override fun getSupportedSourceVersion(): SourceVersion? = SourceVersion.latestSupported()
 
-    override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean =
+    override fun init(processingEnv: ProcessingEnvironment) {
+        super.init(processingEnv)
+        verbose = processingEnv.options[OPTION_VERBOSE]?.toBoolean() ?: verbose
+        verify = processingEnv.options[OPTION_VERIFY]?.toBoolean() ?: verify
+    }
+
+    override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
+        log("Processing started")
         try {
-            processImpl(annotations, roundEnv)
+            if (roundEnv.processingOver()) {
+                generateConfigFiles()
+            } else {
+                processAnnotations(roundEnv)
+            }
         } catch (e: Exception) {
             fatalError(with(StringWriter()) {
                 e.printStackTrace(PrintWriter(this))
                 toString()
             })
-            true
-        }
-
-    private fun processImpl(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        if (roundEnv.processingOver()) {
-            generateConfigFiles()
-        } else {
-            processAnnotations(annotations, roundEnv)
         }
         return true
     }
 
-    private fun processAnnotations(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
+    private fun processAnnotations(roundEnv: RoundEnvironment) {
         val elements: Set<Element> = roundEnv.getElementsAnnotatedWith(AutoPlugin::class.java)
-        log(annotations.toString())
-        log(elements.toString())
 
         val plugin = processingEnv.elementUtils.getTypeElement("org.gradle.api.Plugin")
             ?.asType()
@@ -87,21 +90,22 @@ internal class AutoPluginProcessor : AbstractProcessor() {
             }
 
         for (e in elements) {
+            log("Processing element $e")
             val typeElement = MoreElements.asType(e)
             val autoPlugin = typeElement.getAnnotation(AutoPlugin::class.java)
             val pluginId = autoPlugin.value
 
-            if (!AutoPluginHelpers.validatePluginId(pluginId) { log(it) }) {
+            if (verify && !AutoPluginHelpers.validatePluginId(pluginId) { log(it) }) {
                 error(Errors.pluginIdFormat(pluginId), e)
                 continue
             }
 
-            if (!processingEnv.typeUtils.isAssignable(typeElement.asType(), plugin)) {
+            if (verify && !processingEnv.typeUtils.isAssignable(typeElement.asType(), plugin)) {
                 error(Errors.missingSuperclass(typeElement.getBinaryName()), e)
                 continue
             }
             val existing = providers.put(pluginId, typeElement)
-            if (existing != null) {
+            if (verify && existing != null) {
                 error("Multiple plugins found with the same ID: '$pluginId' ($existing also implements it)", e)
             }
         }
@@ -113,15 +117,17 @@ internal class AutoPluginProcessor : AbstractProcessor() {
             val resourceFile = AutoPluginHelpers.fileNameForPluginId(id)
             log("Working on resource file: $resourceFile")
 
-            try {
-                val existingImplementation = filer.getResource(StandardLocation.CLASS_OUTPUT, "", resourceFile)
-                    .openReader(true)
-                    .use { it.readText() }
-                    .removePrefix("implementation-class=")
-                error("Plugin with ID $id already exists ($existingImplementation)", implementationClass)
-                continue
-            } catch (e: IOException) {
-                // No-op
+            if (verify) {
+                try {
+                    val existingImplementation = filer.getResource(StandardLocation.CLASS_OUTPUT, "", resourceFile)
+                        .openReader(true)
+                        .use { it.readText() }
+                        .removePrefix("implementation-class=")
+                    error("Plugin with ID $id already exists ($existingImplementation)", implementationClass)
+                    continue
+                } catch (e: IOException) {
+                    // No-op
+                }
             }
 
             try {
@@ -151,7 +157,7 @@ internal class AutoPluginProcessor : AbstractProcessor() {
     }
 
     private fun log(msg: String) {
-        if (processingEnv.options.containsKey("debug")) {
+        if (verbose || processingEnv.options.containsKey("debug")) {
             processingEnv.messager.printMessage(Kind.NOTE, msg)
         }
     }
@@ -170,5 +176,7 @@ internal class AutoPluginProcessor : AbstractProcessor() {
 
     companion object {
         private const val GRADLE_PLUGIN = "org.gradle.api.Plugin"
+        const val OPTION_VERIFY = "autoPlugin.verify"
+        const val OPTION_VERBOSE = "autoPlugin.verbose"
     }
 }

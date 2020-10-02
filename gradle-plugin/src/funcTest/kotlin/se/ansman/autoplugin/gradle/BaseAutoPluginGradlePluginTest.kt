@@ -25,73 +25,24 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 
 @Suppress("FunctionName")
-internal class AutoPluginGradlePluginTest {
+internal abstract class BaseAutoPluginGradlePluginTest {
     @TempDir
     lateinit var testProjectDir: File
 
-    private lateinit var settingsFile: File
-    private lateinit var buildFile: File
+    protected lateinit var settingsFile: File
+    protected  lateinit var buildFile: File
+
+    protected val localMavenRepo: String get() = System.getProperty("localMavenRepo")
+    protected val pluginVersion: String get() = System.getProperty("pluginVersion")
 
     @BeforeEach
     fun setup() {
-        settingsFile = testProjectDir.resolve("settings.gradle.kts").apply {
-            writeText("""
-              pluginManagement {
-                resolutionStrategy {
-                  eachPlugin {
-                    when (requested.id.id) {
-                      "se.ansman.autoplugin" -> useModule("se.ansman.autoplugin:gradle-plugin:${'$'}{requested.version}")
-                    }
-                  }
-                }
-                repositories {
-                  maven {
-                    setUrl("${System.getProperty("localMavenRepo")}")
-                  }
-                  gradlePluginPortal()
-                  google()
-                }
-              }
-              
-              rootProject.name = "test"
-            """.trimIndent())
-        }
-        buildFile = testProjectDir.resolve("build.gradle.kts").apply {
-            writeText(
-                """
-                plugins {
-                  kotlin("jvm") version embeddedKotlinVersion
-                  id("se.ansman.autoplugin") version "${System.getProperty("pluginVersion")}"
-                }
-                    
-                buildscript {
-                  repositories {
-                    maven {
-                      setUrl("${System.getProperty("localMavenRepo")}")
-                    }
-                    google()
-                    jcenter()
-                  }
-                }
-                
-                repositories {
-                  maven {
-                    setUrl("${System.getProperty("localMavenRepo")}")
-                  }
-                  google()
-                  jcenter()
-                }
-                
-                autoPlugin.applyKsp()
-                
-                dependencies {
-                  implementation(gradleApi())
-                }
-                
-                """.trimIndent()
-            )
-        }
+        settingsFile = testProjectDir.resolve("settings.gradle.kts")
+        buildFile = testProjectDir.resolve("build.gradle.kts")
+        setupBuildScripts()
     }
+
+    protected abstract fun setupBuildScripts()
 
     @Test
     fun `no sources`() {
@@ -127,9 +78,8 @@ internal class AutoPluginGradlePluginTest {
             .forwardOutput()
             .build()
 
-        val propertiesFile =
-            testProjectDir.resolve("build/generated/ksp/src/main/resources/META-INF/gradle-plugins/com.example.plugin.properties")
-        assertThat(propertiesFile.readText()).isEqualTo("implementation-class=com.example.ExamplePlugin")
+        assertThat(resourceFile("META-INF/gradle-plugins/com.example.plugin.properties").readText())
+            .isEqualTo("implementation-class=com.example.ExamplePlugin")
     }
 
     @Test
@@ -166,13 +116,11 @@ internal class AutoPluginGradlePluginTest {
         assertThat(contents).isEqualTo("implementation-class=com.example.ExamplePlugin")
     }
 
+
+
     @Test
     fun `without verification`() {
-        buildFile.appendText("""
-            autoPlugin {
-              disableVerification()
-            }
-        """.trimIndent())
+        buildFile.appendText(disableVerification)
         testProjectDir.resolve("src/main/kotlin/com/example")
             .apply { check(mkdirs()) }
             .resolve("ExamplePlugin.kt")
@@ -193,7 +141,11 @@ internal class AutoPluginGradlePluginTest {
             .forwardOutput()
             .build()
 
-        val propertiesFile = testProjectDir.resolve("build/generated/ksp/src/main/resources/META-INF/gradle-plugins/.some..invalid_id!.properties")
-        assertThat(propertiesFile.readText()).isEqualTo("implementation-class=com.example.ExamplePlugin")
+        assertThat(resourceFile("META-INF/gradle-plugins/.some..invalid_id!.properties").readText())
+            .isEqualTo("implementation-class=com.example.ExamplePlugin")
     }
+
+    protected abstract fun resourceFile(path: String): File
+
+    protected abstract val disableVerification: String
 }

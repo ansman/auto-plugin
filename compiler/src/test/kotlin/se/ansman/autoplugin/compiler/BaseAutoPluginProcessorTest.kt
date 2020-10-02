@@ -208,11 +208,34 @@ abstract class BaseAutoPluginProcessorTest {
         result.assertMessage(Errors.pluginIdFormat(""))
     }
 
+    @Test
+    fun `without verification`() {
+        val result = compile(
+            """
+                package com.example
+                
+                import org.gradle.api.Plugin
+                import org.gradle.api.Project
+                import se.ansman.autoplugin.AutoPlugin
+                
+                @AutoPlugin("some-plugin!")
+                abstract class SomePlugin : Plugin<Project> {
+                    override fun apply(target: Project) {}
+                }
+            """,
+            verify = false
+        )
+
+        assertThat(result.exitCode).isEqualTo(OK)
+        assertThat(result.getResourceAsText("META-INF/gradle-plugins/some-plugin!.properties"))
+            .isEqualTo("implementation-class=com.example.SomePlugin")
+    }
+
     private fun CompileResult.assertMessage(messages: String) {
         messages.lineSequence().forEach { message -> assertThat(this.messages).contains(message) }
     }
 
-    protected open fun compile(@Language("kotlin") code: String): CompileResult =
+    protected open fun compile(@Language("kotlin") code: String, verify: Boolean = true): CompileResult =
         with(KotlinCompilation()) {
             val output = ByteArrayOutputStream()
             val outputPrinter = PrintStream(output)
@@ -243,7 +266,7 @@ abstract class BaseAutoPluginProcessorTest {
                 sources = listOf(SourceFile.kotlin("Code.kt", code))
                 inheritClassPath = true
                 correctErrorTypes = true
-                configure()
+                configure(verify)
 
                 val result = compile()
                 CompileResult(
@@ -258,7 +281,7 @@ abstract class BaseAutoPluginProcessorTest {
 
         }
 
-    protected open fun KotlinCompilation.configure() {}
+    protected open fun KotlinCompilation.configure(verify: Boolean) {}
 
     @Throws(IOException::class)
     protected abstract fun getResourceAsText(

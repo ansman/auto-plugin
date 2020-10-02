@@ -20,8 +20,11 @@ import java.io.FileNotFoundException
 /** Tests the [AutoPluginProcessor]. */
 class AutoPluginProcessorTest : BaseAutoPluginProcessorTest() {
 
-    override fun KotlinCompilation.configure() {
+    override fun KotlinCompilation.configure(verify: Boolean) {
         annotationProcessors = listOf(AutoPluginProcessor())
+        if (!verify) {
+            kaptArgs["autoPlugin.verify"] = verify.toString()
+        }
     }
 
     override fun getResourceAsText(
