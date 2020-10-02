@@ -18,6 +18,7 @@ import com.google.devtools.ksp.gradle.KspExtension
 import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import javax.inject.Inject
 
 /**
@@ -25,6 +26,19 @@ import javax.inject.Inject
  */
 @Suppress("LeakingThis", "UnstableApiUsage")
 public abstract class AutoPluginExtension @Inject constructor(private val project: Project) {
+    /**
+     * Override the AutoPlugin version used. By default the same version as the AutoPlugin Gradle Plugin is used but
+     * if you need to test a snapshot version it's convenient to be able to override it.
+     */
+    public abstract val version: Property<String>
+
+    init {
+        with(version) {
+            convention(BuildMetadata.VERSION)
+            finalizeValueOnRead()
+        }
+    }
+
     /** Enables verbose logging. By default only errors are logged. */
     public fun verboseLogging(enabled: Boolean = true) {
         setOption("verbose", enabled.toString())

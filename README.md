@@ -94,6 +94,54 @@ dependencies {
 }
 ```
 
+Snapshots
+---
+Snapshots are published to [oss.jfrog.org](https://oss.jfrog.org/artifactory/libs-snapshot/se/ansman/autoplugin/).
+
+To set it up you need to add the snapshot repository:
+```kotlin
+repositories {
+  jcenter()
+  // Add the OSS repo
+  maven {
+    setUrl("https://oss.jfrog.org/artifactory/libs-snapshot")
+  }
+}
+dependencies {
+  implementation("se.ansman.autoplugin:api:<snapshot-version>")
+}
+
+// If you are using the Gradle Plugin you can override the version used like this:
+autoPlugin {
+  version.set("<snapshot-version>")
+}
+```
+
+To use a snapshot version of the Gradle Plugin you need to add this in your `settings.gradle.kts`:
+```kotlin
+pluginManagement {
+  resolutionStrategy {
+    eachPlugin {
+      when (requested.id.id) {
+        "se.ansman.autoplugin" ->
+          useModule("se.ansman.autoplugin:gradle-plugin:${requested.version}")
+      }
+    }
+  }
+  repositories {
+    gradlePluginPortal()
+    maven {
+      setUrl("https://oss.jfrog.org/artifactory/libs-snapshot")
+    }
+  }
+}
+```
+
+Building locally
+---
+To build locally just run `./gradlew publishLibraryPublicationToMavenLocal` and it will install it to your local maven
+repo (`~/.m2/repository`). Add the `mavenLocal()` repo to your project to use it.
+
 Attribution
 ---
 This library is heavily influenced by [Auto Service](https://github.com/google/auto/tree/master/service).

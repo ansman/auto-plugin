@@ -4,7 +4,7 @@
 4. `git commit -am "Prepare for release X.Y.Z"` (where X.Y.Z is the new version)
 5. `git push origin`
 6. `./gradlew clean bintrayUpload publishPlugins`.
-7. Visit the [api artifact](https://bintray.com/ansman/auto-plugin/api#central) and [compiler artifact](https://bintray.com/ansman/auto-plugin/compiler#central) and publish to maven central.
+7. Visit [bintray](https://bintray.com/ansman/auto-plugin/) and publish to maven central.
 8. Release on GitHub
 9. Update the `gradle.properties` to the next SNAPSHOT version.
 10. `git commit -am "Prepare next development version"`
