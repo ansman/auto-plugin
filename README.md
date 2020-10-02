@@ -94,6 +94,15 @@ dependencies {
 }
 ```
 
+Options
+---
+Both the KSP compiler and the AnnotationsProcessor support options:
+* `autoPlugin.verbose = true/false` - Enables verbose logging. Default is `false`. 
+* `autoPlugin.verify = true/false` - Enables verification. Default is `true`.
+
+The the documentation for the respective tools for information on how to pass them. The Gradle Plugin has these options
+in the extension. 
+
 Snapshots
 ---
 Snapshots are published to [oss.jfrog.org](https://oss.jfrog.org/artifactory/libs-snapshot/se/ansman/autoplugin/).
