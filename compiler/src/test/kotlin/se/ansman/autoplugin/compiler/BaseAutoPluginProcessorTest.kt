@@ -231,6 +231,26 @@ abstract class BaseAutoPluginProcessorTest {
             .isEqualTo("implementation-class=com.example.SomePlugin")
     }
 
+    @Test
+    fun `plugins in root package`() {
+        val result = compile(
+            """
+                import org.gradle.api.Plugin
+                import org.gradle.api.Project
+                import se.ansman.autoplugin.AutoPlugin
+                
+                @AutoPlugin("some-plugin")
+                abstract class SomePlugin : Plugin<Project> {
+                    override fun apply(target: Project) {}
+                }
+            """
+        )
+
+        assertThat(result.exitCode).isEqualTo(OK)
+        assertThat(result.getResourceAsText("META-INF/gradle-plugins/some-plugin.properties"))
+            .isEqualTo("implementation-class=SomePlugin")
+    }
+
     private fun CompileResult.assertMessage(messages: String) {
         messages.lineSequence().forEach { message -> assertThat(this.messages).contains(message) }
     }

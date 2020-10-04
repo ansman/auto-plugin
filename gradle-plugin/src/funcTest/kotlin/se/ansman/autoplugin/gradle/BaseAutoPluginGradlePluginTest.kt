@@ -116,8 +116,6 @@ internal abstract class BaseAutoPluginGradlePluginTest {
         assertThat(contents).isEqualTo("implementation-class=com.example.ExamplePlugin")
     }
 
-
-
     @Test
     fun `without verification`() {
         buildFile.appendText(disableVerification)
@@ -143,6 +141,31 @@ internal abstract class BaseAutoPluginGradlePluginTest {
 
         assertThat(resourceFile("META-INF/gradle-plugins/.some..invalid_id!.properties").readText())
             .isEqualTo("implementation-class=com.example.ExamplePlugin")
+    }
+
+    @Test
+    fun `plugins in root package`() {
+        buildFile.appendText(disableVerification)
+        testProjectDir.resolve("src/main/kotlin/")
+            .apply { check(mkdirs()) }
+            .resolve("ExamplePlugin.kt")
+            .writeText(
+                """
+                import se.ansman.autoplugin.AutoPlugin
+                
+                @AutoPlugin("some-plugin")
+                class ExamplePlugin
+            """.trimIndent()
+            )
+
+        GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("--stacktrace", "compileKotlin")
+            .forwardOutput()
+            .build()
+
+        assertThat(resourceFile("META-INF/gradle-plugins/some-plugin.properties").readText())
+            .isEqualTo("implementation-class=ExamplePlugin")
     }
 
     protected abstract fun resourceFile(path: String): File

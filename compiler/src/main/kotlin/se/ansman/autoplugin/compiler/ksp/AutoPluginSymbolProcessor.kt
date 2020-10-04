@@ -125,6 +125,8 @@ internal class AutoPluginSymbolProcessor : SymbolProcessor {
     private fun KSClassDeclaration.toClassName(): ClassName {
         require(!isLocal()) { "Local/anonymous classes are not supported!" }
         val pkgName = packageName.asString()
+            .takeUnless { it == "<root>" }
+            ?: ""
         val typesString = qualifiedName!!.asString().removePrefix("$pkgName.")
 
         val simpleNames = typesString
