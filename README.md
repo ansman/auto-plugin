@@ -1,5 +1,10 @@
+
 AutoPlugin
 ===
+**🚨 DEPRECATION NOTICE 🚨**  
+This repo has been archived in favor for the built-in `java-gradle-plugin` Gradle plugin which is slighly more cumbersome but it does add validation tasks as well as help with publishing of Gradle plugins.
+
+
 ![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/ansman/auto-plugin?include_prereleases)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.ansman.autoplugin/api/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.ansman.autoplugin/api)
 ![Bintray](https://img.shields.io/bintray/v/ansman/auto-plugin/api)
